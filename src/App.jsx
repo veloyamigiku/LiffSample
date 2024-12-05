@@ -13,17 +13,17 @@ function App() {
     inClient: null,
     loggedIn: false,
     os: null,
-    lineVersion: null
+    lineVersion: null,
   });
   const [userInfo, setUserInfo] = useState({
     name: null,
-    lineId: null
+    lineId: null,
   });
 
   useEffect(() => {
     liff
       .init({
-        liffId: import.meta.env.VITE_LIFF_ID
+        liffId: import.meta.env.VITE_LIFF_ID,
       })
       .then(() => {
         setMessage("LIFF init succeeded.");
@@ -34,19 +34,18 @@ function App() {
           inClient: liff.isInClient(),
           loggedIn: liff.isLoggedIn(),
           os: liff.getOS(),
-          lineVersion: liff.getLineVersion()
+          lineVersion: liff.getLineVersion(),
         });
-        
+
         if (liff.isLoggedIn()) {
-          liff.getProfile()
-            .then(profile => {
-              setUserInfo({
-                name: profile.displayName,
-                lineId: profile.userId
-              });
+          const idToken = liff.getIDToken();
+          liff.getProfile().then((profile) => {
+            setUserInfo({
+              name: profile.displayName,
+              lineId: profile.userId,
+            });
           });
         }
-        
       })
       .catch((e) => {
         setMessage("LIFF init failed.");
@@ -56,23 +55,25 @@ function App() {
 
   return (
     <div className="App" id="hoge">
-      <h1>create-liff-app</h1>
+      <h1 className="title">create-liff-app</h1>
       {envInfo.os === "web" && <LoginLogout isLoggedIn={envInfo.loggedIn} />}
-      {message && <p>{message}</p>}
+      {message && <p className="init_status">{message}</p>}
       {error && (
-        <p>
+        <p className="init_status">
           <code>{error}</code>
         </p>
       )}
-      <a
-        href="https://developers.line.biz/ja/docs/liff/"
-        target="_blank"
-        rel="noreferrer"
-      >
-        LIFF Documentation
-      </a>
+      <div className="liff_doc_link_wrap">
+        <a
+          href="https://developers.line.biz/ja/docs/liff/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          LIFF Documentation
+        </a>
+      </div>
       <LiffEnvTable envObj={envInfo} />
-      {envInfo.loggedIn === true && (<LiffEnvTable envObj={userInfo} />)}
+      {envInfo.loggedIn === true && <LiffEnvTable envObj={userInfo} />}
     </div>
   );
 }
